@@ -1,0 +1,16 @@
+syntax = "proto3";
+// buf format -w
+package sample;
+
+service Calculator {
+  rpc Add(AddRequest) returns (AddResponse);
+}
+
+message AddRequest {
+  optional int32 a = 1;
+  optional int32 b = 2;
+}
+
+message AddResponse {
+  optional int32 result = 1;
+}
