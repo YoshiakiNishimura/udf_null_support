@@ -2,3 +2,4 @@
 #shfmt -w
 rm proto/null_pb2.py proto/null_pb2_grpc.py
 rm -rf tmp
+rm libnull.ini libnull.so null.desc.pb

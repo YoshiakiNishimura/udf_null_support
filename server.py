@@ -6,7 +6,8 @@ from proto import null_pb2_grpc
 
 
 class CalculatorServicer(null_pb2_grpc.CalculatorServicer):
-    def Add(self, request, context):
+    def optional_add(self, request, context):
+        print(f"[server] received request: a={request.a}, b={request.b}")
         response = null_pb2.AddResponse()
 
         has_a = request.HasField("a")
