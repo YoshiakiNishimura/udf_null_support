@@ -76,6 +76,8 @@ class ScalarOptionalTestServicer(scalar_optional_pb2_grpc.ScalarOptionalTestServ
             "localtime_value",
             "localdatetime_value",
             "offsetdatatime_value",
+            "blob_value",
+            "clob_value",
         ]
 
         missing = []
@@ -119,6 +121,16 @@ class ScalarOptionalTestServicer(scalar_optional_pb2_grpc.ScalarOptionalTestServ
             request.offsetdatatime_value.time_zone_offset
         )
 
+        response.blob_value.storage_id = request.blob_value.storage_id
+        response.blob_value.object_id = request.blob_value.object_id
+        response.blob_value.tag = request.blob_value.tag
+        response.blob_value.provisioned = request.blob_value.provisioned
+
+        response.clob_value.storage_id = request.clob_value.storage_id
+        response.clob_value.object_id = request.clob_value.object_id
+        response.clob_value.tag = request.clob_value.tag
+        response.clob_value.provisioned = request.clob_value.provisioned
+
         print(
             "[server] response decimal: "
             f"unscaled_value={response.decimal_value.unscaled_value!r}, "
@@ -136,6 +148,20 @@ class ScalarOptionalTestServicer(scalar_optional_pb2_grpc.ScalarOptionalTestServ
             f"offset_seconds={response.offsetdatatime_value.offset_seconds}, "
             f"nano_adjustment={response.offsetdatatime_value.nano_adjustment}, "
             f"time_zone_offset={response.offsetdatatime_value.time_zone_offset}"
+        )
+        print(
+            "[server] response blob: "
+            f"storage_id={response.blob_value.storage_id}, "
+            f"object_id={response.blob_value.object_id}, "
+            f"tag={response.blob_value.tag}, "
+            f"provisioned={response.blob_value.provisioned}"
+        )
+        print(
+            "[server] response clob: "
+            f"storage_id={response.clob_value.storage_id}, "
+            f"object_id={response.clob_value.object_id}, "
+            f"tag={response.clob_value.tag}, "
+            f"provisioned={response.clob_value.provisioned}"
         )
 
         return response

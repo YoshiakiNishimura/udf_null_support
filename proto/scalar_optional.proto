@@ -30,6 +30,8 @@ message OptionalDecimal {
   optional tsurugidb.udf.LocalTime localtime_value = 3;
   optional tsurugidb.udf.LocalDatetime localdatetime_value = 4;
   optional tsurugidb.udf.OffsetDatetime offsetdatatime_value = 5;
+  optional tsurugidb.udf.BlobReference blob_value = 6;
+  optional tsurugidb.udf.ClobReference clob_value = 7;
 }
 service ScalarOptionalTest {
   rpc optional_all(OptionalScalarRequest) returns (OptionalScalarResponse);
