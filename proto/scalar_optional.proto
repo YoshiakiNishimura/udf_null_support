@@ -2,6 +2,8 @@ syntax = "proto3";
 // buf format -w
 package sample;
 
+import "tsurugidb/udf/tsurugi_types.proto";
+
 message OptionalScalarRequest {
   optional double double_value = 1;
   optional float float_value = 2;
@@ -18,15 +20,18 @@ message OptionalScalarRequest {
   optional string string_value = 13;
   optional bytes bytes_value = 14;
 }
-message OptionalStringRequest {
-  optional string string_value = 1;
-}
 
 message OptionalScalarResponse {
   optional double result = 1;
 }
-
+message OptionalDecimal {
+  optional tsurugidb.udf.Decimal decimal_value = 1;
+  optional tsurugidb.udf.Date date_value = 2;
+  optional tsurugidb.udf.LocalTime localtime_value = 3;
+  optional tsurugidb.udf.LocalDatetime localdatetime_value = 4;
+  optional tsurugidb.udf.OffsetDatetime offsetdatatime_value = 5;
+}
 service ScalarOptionalTest {
   rpc optional_all(OptionalScalarRequest) returns (OptionalScalarResponse);
-  rpc optional_string(OptionalStringRequest) returns (OptionalScalarResponse);
+  rpc optional_decimal(OptionalDecimal) returns (OptionalDecimal);
 }

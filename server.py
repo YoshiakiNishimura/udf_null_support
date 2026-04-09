@@ -70,11 +70,23 @@ class ScalarOptionalTestServicer(scalar_optional_pb2_grpc.ScalarOptionalTestServ
 
         print("[server] received optional_decimal request")
 
-        has_value = request.HasField("decimal_value")
-        print(f"[server] decimal_value(has={has_value})")
+        fields = [
+            "decimal_value",
+            "date_value",
+            "localtime_value",
+            "localdatetime_value",
+            "offsetdatatime_value",
+        ]
 
-        if not has_value:
-            print("[server] NULL detected: decimal_value -> result=NULL")
+        missing = []
+        for name in fields:
+            has_value = request.HasField(name)
+            print(f"[server] {name}(has={has_value})")
+            if not has_value:
+                missing.append(name)
+
+        if missing:
+            print(f"[server] NULL detected: {missing} -> result=NULL")
             return response
 
         dec = request.decimal_value
@@ -83,14 +95,49 @@ class ScalarOptionalTestServicer(scalar_optional_pb2_grpc.ScalarOptionalTestServ
             f"unscaled_value={dec.unscaled_value!r}, exponent={dec.exponent}"
         )
 
-        response.value.unscaled_value = dec.unscaled_value
-        response.value.exponent = dec.exponent
+        response.decimal_value.unscaled_value = dec.unscaled_value
+        response.decimal_value.exponent = dec.exponent
+
+        response.date_value.days = request.date_value.days
+
+        response.localtime_value.nanos = request.localtime_value.nanos
+
+        response.localdatetime_value.offset_seconds = (
+            request.localdatetime_value.offset_seconds
+        )
+        response.localdatetime_value.nano_adjustment = (
+            request.localdatetime_value.nano_adjustment
+        )
+
+        response.offsetdatatime_value.offset_seconds = (
+            request.offsetdatatime_value.offset_seconds
+        )
+        response.offsetdatatime_value.nano_adjustment = (
+            request.offsetdatatime_value.nano_adjustment
+        )
+        response.offsetdatatime_value.time_zone_offset = (
+            request.offsetdatatime_value.time_zone_offset
+        )
 
         print(
             "[server] response decimal: "
-            f"unscaled_value={response.value.unscaled_value!r}, "
-            f"exponent={response.value.exponent}"
+            f"unscaled_value={response.decimal_value.unscaled_value!r}, "
+            f"exponent={response.decimal_value.exponent}"
         )
+        print(f"[server] response date.days={response.date_value.days}")
+        print(f"[server] response localtime.nanos={response.localtime_value.nanos}")
+        print(
+            "[server] response localdatetime: "
+            f"offset_seconds={response.localdatetime_value.offset_seconds}, "
+            f"nano_adjustment={response.localdatetime_value.nano_adjustment}"
+        )
+        print(
+            "[server] response offsetdatetime: "
+            f"offset_seconds={response.offsetdatatime_value.offset_seconds}, "
+            f"nano_adjustment={response.offsetdatatime_value.nano_adjustment}, "
+            f"time_zone_offset={response.offsetdatatime_value.time_zone_offset}"
+        )
+
         return response
 
 
