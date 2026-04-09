@@ -1,0 +1,11 @@
+DELETE FROM t_decimal;
+
+INSERT INTO t_decimal VALUES (
+  1234.53,
+  DATE '2000-01-01',
+  NULL,
+  NULL,
+  TIMESTAMP WITH TIME ZONE '2000-01-02 11:22:33+09:00',
+  X'1234',
+  'abc'
+);

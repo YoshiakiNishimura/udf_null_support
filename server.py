@@ -37,100 +37,81 @@ NUMERIC_FIELDS = [
     "sfixed64_value",
 ]
 
+OPTIONAL_DECIMAL_FIELDS = [
+    "decimal_value",
+    "date_value",
+    "localtime_value",
+    "localdatetime_value",
+    "offsetdatatime_value",
+    "blob_value",
+    "clob_value",
+]
+
 
 class ScalarOptionalTestServicer(scalar_optional_pb2_grpc.ScalarOptionalTestServicer):
-    def optional_all(self, request, context):
-        response = scalar_optional_pb2.OptionalScalarResponse()
-
-        print("[server] received request")
-        missing = []
-        parts = []
-
-        for name, _ in FIELD_SPECS:
-            has_value = request.HasField(name)
-            value = getattr(request, name)
-            parts.append(f"{name}(has={has_value}, val={value!r})")
-            if not has_value:
-                missing.append(name)
-
-        print("[server] " + " | ".join(parts))
-
-        if missing:
-            print(f"[server] NULL detected: {missing} -> result=NULL")
-            return response
-
-        total = sum(getattr(request, name) for name in NUMERIC_FIELDS)
-
-        response.result = float(total)
-        print(f"[server] result={response.result}")
-        return response
-
-    def optional_decimal(self, request, context):
-        response = scalar_optional_pb2.OptionalDecimal()
-
-        print("[server] received optional_decimal request")
-
-        fields = [
-            "decimal_value",
-            "date_value",
-            "localtime_value",
-            "localdatetime_value",
-            "offsetdatatime_value",
-            "blob_value",
-            "clob_value",
-        ]
-
+    @staticmethod
+    def _collect_missing_fields(request, fields):
         missing = []
         for name in fields:
             has_value = request.HasField(name)
             print(f"[server] {name}(has={has_value})")
             if not has_value:
                 missing.append(name)
+        return missing
 
-        if missing:
-            print(f"[server] NULL detected: {missing} -> result=NULL")
-            return response
+    @staticmethod
+    def _print_optional_all_request(request):
+        parts = []
+        for name, _ in FIELD_SPECS:
+            has_value = request.HasField(name)
+            value = getattr(request, name)
+            parts.append(f"{name}(has={has_value}, val={value!r})")
+        print("[server] " + " | ".join(parts))
 
-        dec = request.decimal_value
-        print(
-            "[server] decimal: "
-            f"unscaled_value={dec.unscaled_value!r}, exponent={dec.exponent}"
-        )
+    @staticmethod
+    def _print_optional_decimal_request(request):
+        if request.HasField("decimal_value"):
+            print(
+                "[server] request decimal: "
+                f"unscaled_value={request.decimal_value.unscaled_value!r}, "
+                f"exponent={request.decimal_value.exponent}"
+            )
+        if request.HasField("date_value"):
+            print(f"[server] request date.days={request.date_value.days}")
+        if request.HasField("localtime_value"):
+            print(f"[server] request localtime.nanos={request.localtime_value.nanos}")
+        if request.HasField("localdatetime_value"):
+            print(
+                "[server] request localdatetime: "
+                f"offset_seconds={request.localdatetime_value.offset_seconds}, "
+                f"nano_adjustment={request.localdatetime_value.nano_adjustment}"
+            )
+        if request.HasField("offsetdatatime_value"):
+            print(
+                "[server] request offsetdatetime: "
+                f"offset_seconds={request.offsetdatatime_value.offset_seconds}, "
+                f"nano_adjustment={request.offsetdatatime_value.nano_adjustment}, "
+                f"time_zone_offset={request.offsetdatatime_value.time_zone_offset}"
+            )
+        if request.HasField("blob_value"):
+            print(
+                "[server] request blob: "
+                f"storage_id={request.blob_value.storage_id}, "
+                f"object_id={request.blob_value.object_id}, "
+                f"tag={request.blob_value.tag}, "
+                f"provisioned={request.blob_value.provisioned}"
+            )
+        if request.HasField("clob_value"):
+            print(
+                "[server] request clob: "
+                f"storage_id={request.clob_value.storage_id}, "
+                f"object_id={request.clob_value.object_id}, "
+                f"tag={request.clob_value.tag}, "
+                f"provisioned={request.clob_value.provisioned}"
+            )
 
-        response.decimal_value.unscaled_value = dec.unscaled_value
-        response.decimal_value.exponent = dec.exponent
-
-        response.date_value.days = request.date_value.days
-
-        response.localtime_value.nanos = request.localtime_value.nanos
-
-        response.localdatetime_value.offset_seconds = (
-            request.localdatetime_value.offset_seconds
-        )
-        response.localdatetime_value.nano_adjustment = (
-            request.localdatetime_value.nano_adjustment
-        )
-
-        response.offsetdatatime_value.offset_seconds = (
-            request.offsetdatatime_value.offset_seconds
-        )
-        response.offsetdatatime_value.nano_adjustment = (
-            request.offsetdatatime_value.nano_adjustment
-        )
-        response.offsetdatatime_value.time_zone_offset = (
-            request.offsetdatatime_value.time_zone_offset
-        )
-
-        response.blob_value.storage_id = request.blob_value.storage_id
-        response.blob_value.object_id = request.blob_value.object_id
-        response.blob_value.tag = request.blob_value.tag
-        response.blob_value.provisioned = request.blob_value.provisioned
-
-        response.clob_value.storage_id = request.clob_value.storage_id
-        response.clob_value.object_id = request.clob_value.object_id
-        response.clob_value.tag = request.clob_value.tag
-        response.clob_value.provisioned = request.clob_value.provisioned
-
+    @staticmethod
+    def _print_optional_decimal_response(response):
         print(
             "[server] response decimal: "
             f"unscaled_value={response.decimal_value.unscaled_value!r}, "
@@ -164,6 +145,40 @@ class ScalarOptionalTestServicer(scalar_optional_pb2_grpc.ScalarOptionalTestServ
             f"provisioned={response.clob_value.provisioned}"
         )
 
+    def optional_all(self, request, context):
+        response = scalar_optional_pb2.OptionalScalarResponse()
+
+        print("[server] received optional_all request")
+        self._print_optional_all_request(request)
+
+        missing = []
+        for name, _ in FIELD_SPECS:
+            if not request.HasField(name):
+                missing.append(name)
+
+        if missing:
+            print(f"[server] NULL detected: {missing} -> result=NULL")
+            return response
+
+        total = sum(getattr(request, name) for name in NUMERIC_FIELDS)
+        response.result = float(total)
+
+        print(f"[server] result={response.result}")
+        return response
+
+    def optional_decimal(self, request, context):
+        response = scalar_optional_pb2.OptionalDecimal()
+
+        print("[server] received optional_decimal request")
+        missing = self._collect_missing_fields(request, OPTIONAL_DECIMAL_FIELDS)
+        self._print_optional_decimal_request(request)
+
+        if missing:
+            print(f"[server] NULL detected: {missing} -> result=NULL")
+            return response
+
+        response.CopyFrom(request)
+        self._print_optional_decimal_response(response)
         return response
 
 
