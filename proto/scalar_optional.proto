@@ -15,6 +15,11 @@ message OptionalScalarRequest {
   optional fixed64 fixed64_value = 10;
   optional sfixed32 sfixed32_value = 11;
   optional sfixed64 sfixed64_value = 12;
+  optional string string_value = 13;
+  optional bytes bytes_value = 14;
+}
+message OptionalStringRequest {
+  optional string string_value = 1;
 }
 
 message OptionalScalarResponse {
@@ -23,4 +28,5 @@ message OptionalScalarResponse {
 
 service ScalarOptionalTest {
   rpc optional_all(OptionalScalarRequest) returns (OptionalScalarResponse);
+  rpc optional_string(OptionalStringRequest) returns (OptionalScalarResponse);
 }
