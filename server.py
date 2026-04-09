@@ -65,6 +65,34 @@ class ScalarOptionalTestServicer(scalar_optional_pb2_grpc.ScalarOptionalTestServ
         print(f"[server] result={response.result}")
         return response
 
+    def optional_decimal(self, request, context):
+        response = scalar_optional_pb2.OptionalDecimal()
+
+        print("[server] received optional_decimal request")
+
+        has_value = request.HasField("decimal_value")
+        print(f"[server] decimal_value(has={has_value})")
+
+        if not has_value:
+            print("[server] NULL detected: decimal_value -> result=NULL")
+            return response
+
+        dec = request.decimal_value
+        print(
+            "[server] decimal: "
+            f"unscaled_value={dec.unscaled_value!r}, exponent={dec.exponent}"
+        )
+
+        response.value.unscaled_value = dec.unscaled_value
+        response.value.exponent = dec.exponent
+
+        print(
+            "[server] response decimal: "
+            f"unscaled_value={response.value.unscaled_value!r}, "
+            f"exponent={response.value.exponent}"
+        )
+        return response
+
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=4))
