@@ -13,7 +13,7 @@ CREATE TABLE t (
   fixed32_value INT,
   fixed64_value BIGINT,
   sfixed32_value INT,
-  sfixed64_value INT,
+  sfixed64_value BIGINT,
   string_value VARCHAR(255),
   bytes_value VARBINARY(255)
 );

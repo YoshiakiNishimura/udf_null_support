@@ -1,4 +1,4 @@
-SELECT optional_all(
+SELECT tsurugi_scalar_optional(
   double_value,
   float_value,
   int32_value,

@@ -1,0 +1,4 @@
+DELETE FROM t;
+INSERT INTO t VALUES (
+  NULL, 2.5, NULL, 4, NULL, 6, NULL, -8, NULL, 10, NULL, -12, 'hello', X'68656c6c6f'
+);
